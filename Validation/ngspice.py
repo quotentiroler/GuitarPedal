@@ -152,7 +152,12 @@ def op(name, params=None, nodes=()):
 
 def ac(name, node, freqs, params=None, per_decade=200):
     """Small-signal gain in dB at each of 'freqs', from a 1 V AC input."""
-    src = _params(netlist(name), params)
+    return ac_src(netlist(name), node, freqs, params, per_decade)
+
+
+def ac_src(src, node, freqs, params=None, per_decade=200):
+    """ac() on a deck already in hand, rather than one read from spice/."""
+    src = _params(src, params)
     lo, hi = min(freqs) * 0.9, max(freqs) * 1.1
     data = _run(src, "ac dec %d %g %g" % (per_decade, lo, hi), ["v(%s)" % node])
     f = data[:, 0]

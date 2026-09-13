@@ -193,6 +193,7 @@ check-analog:
 # it skips, so it can't quietly stop testing anything.
 #
 NODE := $(shell command -v node 2>/dev/null)
+NGSPICE := $(shell command -v ngspice 2>/dev/null)
 
 #
 # The hardware half.  Wants a pedal on the USB and a signal generator on
@@ -285,6 +286,17 @@ else
 	r=$$?; rm -rf $$t; exit $$r
 endif
 
+#
+# Which component is wrong, asked of a netlist rather than a board.  Its
+# own target because ngspice is the one thing here that is not python.
+#
+check-faults:
+ifeq ($(NGSPICE),)
+	@echo "test-faults: SKIPPED - no ngspice in PATH"
+else
+	./test-faults.py
+endif
+
 .PHONY: bench check check-analog check-analysis check-bench check-biquad
 .PHONY: check-boot check-effects check-hw check-loop
-.PHONY: check-midi check-reboot check-split
+.PHONY: check-faults check-midi check-reboot check-split
