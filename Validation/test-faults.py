@@ -30,11 +30,17 @@ import targets
 
 T = targets.target("rat")
 NETLIST, NODE = T["netlist"], T["node"]
-FREQS = [40.0, 80.0, 160.0, 320.0, 640.0, 1250.0, 2500.0, 5000.0, 10000.0]
+# Log-spaced across the band the pots offer.  25 rather than 9 because
+# the residual is an RMS over these points, so noise averages down with
+# more of them, and ac_src() runs one sweep and interpolates - the extra
+# points are free.  Measured: top-1 under 0.05 dB RMS noise goes 90% -> 97%.
+FREQS = list(np.geomspace(40.0, 12000.0, 25))
 
 # One decade either side of nominal is the range a wrong part lands in:
 # a decade-off resistor, a cap in the wrong decade, a part fitted backwards.
 FACTORS = (0.1, 0.22, 0.47, 2.2, 4.7, 10.0)
+
+TRIALS = (("R2", 4.7), ("C2", 4.7), ("R4", 0.22), ("C1", 0.22))
 
 FAILED = []
 
@@ -91,24 +97,65 @@ def localisation():
     src = ngspice.netlist(NETLIST)
     params = T["spice"](T["knobs"])
     hits = 0
-    trials = (("R2", 4.7), ("C2", 4.7), ("R4", 0.22), ("C1", 0.22))
-    for ref, factor in trials:
+    for ref, factor in TRIALS:
         faulty = faults.perturb(src, ref, factor)
         measured = ngspice.ac_src(faulty, NODE, FREQS, params=params)
         ranked = faults.localise(src, NODE, FREQS, measured,
-                                 refs=[r for r, _ in trials],
+                                 refs=[r for r, _ in TRIALS],
                                  factors=FACTORS, params=params)
         top_ref, top_factor = ranked[0][1], ranked[0][2]
         ok = top_ref == ref
         hits += ok
         record("%s x%.2f -> %s x%.2f" % (ref, factor, top_ref, top_factor),
                ok, "" if ok else "named the wrong part")
-    record("top-1 over every trial", hits == len(trials),
-           "%d/%d" % (hits, len(trials)))
+    record("top-1 over every trial", hits == len(TRIALS),
+           "%d/%d" % (hits, len(TRIALS)))
+
+
+def realism():
+    """A real leg is not a SPICE sweep: it has a gain offset and noise.
+
+    The offsets are asserted, because a leg that cannot survive one is
+    useless.  The noise is CHARACTERISED and only loosely asserted: what
+    matters is the budget a bench has to hit, and that is a number to
+    report rather than a threshold to pass.
+    """
+    print("realism  (what a physical measurement does to the ranking)")
+    src = ngspice.netlist(NETLIST)
+    params = T["spice"](T["knobs"])
+    refs = sorted(faults.components(src))
+    cands = faults.candidates(src, NODE, FREQS, refs, FACTORS, params)
+    truth = {r: faults.candidates(src, NODE, FREQS, [r], [f], params)[1][2]
+             for r, f in TRIALS}
+
+    ref, factor = TRIALS[0]
+    for offset in (6.0, -13.7):
+        top = faults.match(cands, truth[ref] + offset)[0]
+        record("survives a %+.1f dB gain offset" % offset, top[1] == ref,
+               "named %s x%.2f" % (top[1], top[2]))
+
+    rng = np.random.default_rng(20260913)
+    print("    top-1 against %d candidates, %d draws per point:" % (
+          len(cands), 20 * len(TRIALS)))
+    rate = {}
+    for sigma in (0.02, 0.05, 0.10, 0.20):
+        hits = 0
+        for r, _f in TRIALS:
+            for _ in range(20):
+                m = truth[r] + rng.normal(0.0, sigma, len(FREQS)) + 6.0
+                hits += faults.match(cands, m)[0][1] == r
+        rate[sigma] = 100.0 * hits / (20 * len(TRIALS))
+        print("      %.2f dB RMS -> %3.0f%%" % (sigma, rate[sigma]))
+
+    record("clean measurement is unambiguous", rate[0.02] == 100.0,
+           "%.0f%%" % rate[0.02])
+    record("0.05 dB RMS is a workable bench budget", rate[0.05] >= 90.0,
+           "%.0f%%" % rate[0.05])
 
 
 def main():
-    for stage in (parse_values, component_table, perturbation, localisation):
+    for stage in (parse_values, component_table, perturbation,
+                  localisation, realism):
         stage()
         print()
     if FAILED:
