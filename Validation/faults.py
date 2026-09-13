@@ -90,28 +90,50 @@ def perturb(src, ref, factor):
     return out
 
 
-def residual(a, b):
-    """How far apart two dB curves are, in dB RMS."""
-    return float(np.sqrt(np.mean((np.asarray(a) - np.asarray(b)) ** 2)))
+def residual(a, b, align=True):
+    """How far apart two dB curves are in SHAPE, in dB RMS.
+
+    'align' removes the best constant offset first, and is on because a
+    measured leg never arrives at the netlist's absolute level: the
+    interface has its own gain, the part under test has its own output
+    level, and neither is the thing being diagnosed.  Without it a level
+    error of a few dB swamps every shape difference and the ranking
+    answers a question nobody asked.
+    """
+    d = np.asarray(a, dtype=float) - np.asarray(b, dtype=float)
+    if align:
+        d = d - d.mean()
+    return float(np.sqrt(np.mean(d * d)))
 
 
-def localise(src, node, freqs, measured, refs=None, factors=(), params=None):
-    """Rank single-component faults by how well each explains 'measured'.
+def candidates(src, node, freqs, refs=None, factors=(), params=None):
+    """Every single-component fault, simulated once, as [(ref, factor, db)].
 
-    Returns [(residual_db, ref, factor)], closest first.  The nominal
-    circuit is included as the (ref=None, factor=1.0) candidate, so a
-    board that is simply correct says so rather than being made to pick a
-    scapegoat.
+    Separate from the matching because the library does not depend on the
+    measurement: a bench simulates this once for a board it knows and then
+    diagnoses as many builds as walk past.  The nominal circuit is in here
+    as (None, 1.0) so a board that is simply correct can say so rather than
+    being made to pick a scapegoat.
     """
     if refs is None:
         refs = sorted(components(src))
-
-    out = [(residual(ngspice.ac_src(src, node, freqs, params=params), measured),
-            None, 1.0)]
+    out = [(None, 1.0, ngspice.ac_src(src, node, freqs, params=params))]
     for ref in refs:
         for f in factors:
-            cand = ngspice.ac_src(perturb(src, ref, f), node, freqs,
-                                  params=params)
-            out.append((residual(cand, measured), ref, f))
+            out.append((ref, f, ngspice.ac_src(perturb(src, ref, f), node,
+                                               freqs, params=params)))
+    return out
+
+
+def match(cands, measured, align=True):
+    """Rank a library against one measurement: [(residual_db, ref, factor)]."""
+    out = [(residual(db, measured, align), ref, f) for ref, f, db in cands]
     out.sort(key=lambda r: r[0])
     return out
+
+
+def localise(src, node, freqs, measured, refs=None, factors=(), params=None,
+             align=True):
+    """candidates() then match(), for a caller diagnosing exactly one board."""
+    return match(candidates(src, node, freqs, refs, factors, params),
+                 measured, align)
