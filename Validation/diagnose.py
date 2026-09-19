@@ -1,0 +1,176 @@
+#!/usr/bin/env python3
+#
+# Which component of the pedal under test is wrong?
+#
+# loop.py already drives an analog pedal and hands back a calibrated
+# answer.  compare-spice.py already asks a netlist the same question the
+# model is asked.  What neither does is say which PART of the circuit the
+# disagreement lives in, and that is the only answer somebody holding a
+# soldering iron can act on.
+#
+# So every single-component fault the netlist could have is simulated,
+# and the one that best explains the measurement wins.  The ranking is
+# netfault, which is a packaged fault dictionary - the method is old, and
+# the survey is Bandler and Salama, Proc. IEEE 73 (1985).  This file is
+# the part that is specific to this bench: the legs, the ladder, and the
+# refusal to answer when nothing fits.
+#
+# WHY A LADDER AND NOT A SWEEP
+#
+# [RAT]'s clamp is a logarithm, so the pedal keeps getting louder after
+# it starts clipping and the Distortion pot drags the closed-loop corner
+# across most of the audio band.  One sweep at one level characterises
+# almost none of that, and the part that sets where it folds does nothing
+# at all until the drive reaches it.  So a signature here is one response
+# per drive level, and a candidate is compared rung by rung.
+#
+import argparse
+import os
+import sys
+
+try:
+    import numpy as np
+except ImportError:
+    print("diagnose: SKIPPED - no numpy")
+    sys.exit(0)
+
+try:
+    import netfault
+except ImportError:
+    print("diagnose: SKIPPED - netfault is not installed")
+    print("          pip install git+https://github.com/quotentiroler/netfault")
+    sys.exit(0)
+
+import loop
+import ngspice
+import pedal
+import targets
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+
+# Where the pots offer something, and coarse enough that a dictionary is
+# minutes rather than an afternoon.
+FREQS = [80.0, 160.0, 320.0, 640.0, 1250.0, 2500.0, 5000.0, 10000.0]
+
+# The rungs.  Below the lowest the clamp does nothing and every candidate
+# looks alike; above the highest the converter is what is being measured.
+LEVELS = (-36.0, -24.0, -12.0)
+
+SECONDS = 0.4
+
+
+def spice_leg(t, knobs):
+    """simulate(src, freqs, level) -> dB, through ngspice on a given deck.
+
+    A transient rather than an ac sweep, because the circuit this exists
+    for stops being linear the moment it is driven properly, and an ac
+    sweep answers as though it never does.
+    """
+    params = t["spice"](knobs)
+
+    def simulate(src, freqs, level=None):
+        dbfs = -36.0 if level is None else level
+        out = []
+        for hz in freqs:
+            x = loop.tone(hz, dbfs, int(SECONDS * loop.FS))
+            y = ngspice.tran_src(src, t["node"], x, fs=loop.FS, params=params)
+            out.append(loop.tone_db(y, hz))
+        return np.asarray(out)
+
+    return simulate
+
+
+def measured_ladder(card, report=print):
+    """The board on the bench, one response per rung."""
+    rows = []
+    for level in LEVELS:
+        row = []
+        for hz in FREQS:
+            _sent, back = loop.measure_tone(card, hz, level, seconds=SECONDS,
+                                            report=report)
+            row.append(loop.tone_db(back, hz))
+        report("  %+.0f dBFS rung taken" % level)
+        rows.append(row)
+    return np.asarray(rows)
+
+
+def main():
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("target", nargs="?", default="rat",
+                    help="which target's netlist the board claims to be")
+    ap.add_argument("--pedal", default=None,
+                    help="serial, label or product substring naming one pedal")
+    ap.add_argument("--exclude", default="",
+                    help="parts that are not on the board and so cannot be "
+                         "mis-fitted, comma separated")
+    ap.add_argument("--top", type=int, default=5)
+    args = ap.parse_args()
+
+    t = targets.target(args.target)
+    src = ngspice.netlist(t["netlist"])
+    parts = netfault.components(src)
+    skip = {r.strip() for r in args.exclude.split(",") if r.strip()}
+    refs = [r for r in sorted(parts) if r not in skip]
+    if not refs:
+        sys.exit("diagnose: %s has no plain-valued R/C/L to blame"
+                 % t["netlist"])
+
+    d, why = pedal.sole(args.pedal)
+    if not d:
+        print("diagnose: SKIPPED - %s" % why)
+        return 0
+    print("diagnose: %s, %s" % (d["label"], pedal.use_map(d)))
+    print("          %s against %s, %d parts, %d rungs, %d points"
+          % (args.target, t["netlist"], len(refs), len(LEVELS), len(FREQS)))
+    if skip:
+        print("          not on the board: %s" % ", ".join(sorted(skip)))
+
+    loop.refuse_if_stale(d["port"])
+    loop.configure(d["port"], "hardware", t)
+
+    print("\n  measuring the board")
+    measured = measured_ladder(d["card"])
+
+    print("  building the dictionary (%d simulations)"
+          % ((len(refs) * len(netfault.FACTORS) + 1) * len(LEVELS) * len(FREQS)))
+    sim = spice_leg(t, t["knobs"])
+    cands = netfault.candidates(src, FREQS, sim, refs, netfault.FACTORS,
+                                levels=LEVELS)
+
+    noise = netfault.FLOOR_DB
+    usable = netfault.resolvable(cands, noise)
+    dropped = len(cands) - len(usable)
+    if dropped:
+        print("  %d of %d candidates are below this bench's resolution"
+              % (dropped, len(cands) - 1))
+
+    v = netfault.explain(usable, measured, noise_db=noise)
+
+    print("\n  %-10s %-8s %s" % ("part", "factor", "residual dB"))
+    for resid, ref, factor in v["ranked"][:args.top]:
+        print("  %-10s %-8s %.4f"
+              % (ref or "(nominal)", "-" if ref is None else netfault.describe(factor),
+                 resid))
+
+    print()
+    if v["verdict"] == "unexplained":
+        print("  NOTHING HERE EXPLAINS THIS (%.4f dB residual)." % v["residual"])
+        print("  The netlist does not describe this board.  That is the thing")
+        print("  to fix before any part above is believed.")
+    elif v["verdict"] == "nominal":
+        print("  the board matches %s (%.4f dB)" % (t["netlist"], v["residual"]))
+    elif v["verdict"] == "ambiguous":
+        nxt = v["ranked"][1]
+        print("  AMBIGUOUS: %s is only %.4f dB better than %s."
+              % (v["ref"] or "nominal", v["margin"], nxt[1] or "nominal"))
+    else:
+        print("  %s at %s (%.3g -> %.3g)"
+              % (v["ref"], netfault.describe(v["factor"]),
+                 parts[v["ref"]]["value"], parts[v["ref"]]["value"] * v["factor"]))
+        print("  %.4f dB residual, %.4f dB clear of the next answer"
+              % (v["residual"], v["margin"]))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
