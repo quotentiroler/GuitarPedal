@@ -74,21 +74,29 @@ def spice_leg(t, knobs):
         for hz in freqs:
             x = loop.tone(hz, dbfs, int(SECONDS * loop.FS))
             y = ngspice.tran_src(src, t["node"], x, fs=loop.FS, params=params)
-            out.append(loop.tone_db(y, hz))
+            out.append(loop.tone_db(y, hz) - loop.tone_db(x, hz))
         return np.asarray(out)
 
     return simulate
 
 
-def measured_ladder(card, report=print):
-    """The board on the bench, one response per rung."""
+def loop_response(card, report=print):
+    """What the loop does to each frequency, pedal under test bypassed."""
+    _delay, f, h = loop.calibrate(card)
+    report("  loop measured, %.2f to %.2f dB across the band"
+           % (20.0 * np.log10(np.abs(h)).min(), 20.0 * np.log10(np.abs(h)).max()))
+    return np.interp(FREQS, f, 20.0 * np.log10(np.abs(h)))
+
+
+def measured_ladder(card, loop_db, report=print):
+    """The board on the bench, one gain per rung, the loop taken out."""
     rows = []
     for level in LEVELS:
         row = []
-        for hz in FREQS:
-            _sent, back = loop.measure_tone(card, hz, level, seconds=SECONDS,
-                                            report=report)
-            row.append(loop.tone_db(back, hz))
+        for hz, cal in zip(FREQS, loop_db):
+            sent, back = loop.measure_tone(card, hz, level, seconds=SECONDS,
+                                           report=report)
+            row.append(loop.tone_db(back, hz) - loop.tone_db(sent, hz) - cal)
         report("  %+.0f dBFS rung taken" % level)
         rows.append(row)
     return np.asarray(rows)
@@ -128,8 +136,14 @@ def main():
     loop.refuse_if_stale(d["port"])
     loop.configure(d["port"], "hardware", t)
 
+    print("\n  put the pedal under test in bypass, then Enter: ", end="")
+    input()
+    loop_db = loop_response(d["card"])
+    print("  engage it again, then Enter: ", end="")
+    input()
+
     print("\n  measuring the board")
-    measured = measured_ladder(d["card"])
+    measured = measured_ladder(d["card"], loop_db)
 
     print("  building the dictionary (%d simulations)"
           % ((len(refs) * len(netfault.FACTORS) + 1) * len(LEVELS) * len(FREQS)))
@@ -137,14 +151,16 @@ def main():
     cands = netfault.candidates(src, FREQS, sim, refs, netfault.FACTORS,
                                 levels=LEVELS)
 
+    # Both sides are gains, so aligning would throw away the level a
+    # fault most often moves.
     noise = netfault.FLOOR_DB
-    usable = netfault.resolvable(cands, noise)
+    usable = netfault.resolvable(cands, noise, align=False)
     dropped = len(cands) - len(usable)
     if dropped:
         print("  %d of %d candidates are below this bench's resolution"
               % (dropped, len(cands) - 1))
 
-    v = netfault.explain(usable, measured, noise_db=noise)
+    v = netfault.explain(usable, measured, noise_db=noise, align=False)
 
     print("\n  %-10s %-8s %s" % ("part", "factor", "residual dB"))
     for resid, ref, factor in v["ranked"][:args.top]:
