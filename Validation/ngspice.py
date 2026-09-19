@@ -35,6 +35,7 @@
 import hashlib
 import os
 import re
+import shutil
 import subprocess
 import tempfile
 
@@ -109,6 +110,13 @@ def _params(src, params):
     return src
 
 
+# The MSYS2 package ships two binaries and only one of them is usable
+# from a script: plain ngspice opens a window per invocation, which a
+# dictionary of a few thousand runs makes unbearable.  Absent elsewhere,
+# so this falls back to the name everyone else has.
+NGSPICE = shutil.which("ngspice_con") or "ngspice"
+
+
 def _run(src, control, columns):
     """Run one control block, and read back what wrdata wrote."""
     with tempfile.TemporaryDirectory() as tmp:
@@ -119,7 +127,7 @@ def _run(src, control, columns):
         log = os.path.join(tmp, "deck.log")
         with open(cir, "w") as f:
             f.write(deck)
-        r = subprocess.run(["ngspice", "-b", "-o", log, cir],
+        r = subprocess.run([NGSPICE, "-b", "-o", log, cir],
                            stdin=subprocess.DEVNULL, capture_output=True,
                            text=True, timeout=1800)
         if not os.path.exists(out):
