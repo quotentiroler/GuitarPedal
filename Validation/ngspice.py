@@ -203,7 +203,7 @@ MAX_TRAN_SAMPLES = 200000
 
 
 def tran(name, node, x, fs=48000.0, params=None, settle=0.2,
-         drive=None, offset=0.0):
+         drive=None, offset=0.0, over=1):
     """Push a sample array through the netlist.  Returns the same length.
 
     'drive' cuts the netlist open: instead of the input, the stimulus is
@@ -219,12 +219,22 @@ def tran(name, node, x, fs=48000.0, params=None, settle=0.2,
     having an opinion about the load.  Whether that assumption is right
     is a different question, and driving the node is how it gets asked.
     """
-    return tran_src(netlist(name), node, x, fs, params, settle, drive, offset)
+    return tran_src(netlist(name), node, x, fs, params, settle, drive, offset,
+                    over)
 
 
 def tran_src(src, node, x, fs=48000.0, params=None, settle=0.2,
-             drive=None, offset=0.0):
-    """tran() on a deck already in hand, for a netlist built rather than read."""
+             drive=None, offset=0.0, over=1):
+    """tran() on a deck already in hand, for a netlist built rather than read.
+
+    'over' steps ngspice that many times per sample.  At 1, which is the
+    default and what everything here has always done, the deck is only
+    an oracle up to about 8 kHz: three steps per cycle at 16 kHz is not
+    a waveform, and comparing against it there reported the model 12 dB
+    down when 4x puts it within 2.6.  Anything looking at the top octave
+    has to raise this; anything looking at F0 and its first harmonics
+    does not, and pays 4x the runtime if it does.
+    """
     x = np.asarray(x, dtype=float)
     n = len(x)
     if n > MAX_TRAN_SAMPLES:
@@ -251,11 +261,11 @@ def tran_src(src, node, x, fs=48000.0, params=None, settle=0.2,
                    lambda _m: "Vin in 0 " + body, src, "the input source")
 
     stop = settle + n / fs
-    ctl = "tran %.9g %.9g 0 %.9g" % (1.0 / fs, stop, 1.0 / fs)
+    ctl = "tran %.9g %.9g 0 %.9g" % (1.0 / fs, stop, 1.0 / (fs * over))
 
     key = hashlib.sha256()
     for part in (str(CACHE_VERSION), src, ctl, node,
-                 "%.9g" % fs, "%.9g" % settle):
+                 "%.9g" % fs, "%.9g" % settle, "%d" % over):
         key.update(part.encode())
         key.update(b"\0")
     key.update(np.ascontiguousarray(t, dtype=np.float64).tobytes())
