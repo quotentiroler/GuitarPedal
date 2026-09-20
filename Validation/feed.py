@@ -170,45 +170,14 @@ def capture_busy(card):
 def sub_sample(a, b, guard=4800):
     """Line b up with a to a fraction of a sample, by fitting the delay.
 
-    Worth doing because the stakes are high and invisible: on this
-    material a *purely* fractional offset of 0.05 samples, with nothing
-    else wrong at all, leaves a residual 48.5 dB below the signal, and
-    0.2 samples leaves 36.4.  A null taken on a sloppy alignment is a
-    measurement of the alignment.
-
-    On the USB path it comes out at exactly zero, every time, which is
-    the answer rather than a disappointment: in over USB, through the
-    DSP, out over USB is a digital path end to end and nobody resamples
-    it.  That is worth having measured rather than assumed, and it stops
-    being true the moment this is pointed at the analog loop.
-
-    The delay goes on 'a' as a phase ramp, which is exact for a band-
-    limited signal.  'guard' samples are dropped from each end because
-    that ramp is circular and the wrap does not belong in the residual -
-    and because the ends do not correspond anyway: the bench starts from
-    a settled filter and the capture starts from a stream opening.
-    Trimming them is what took the null from -52 dB to the noise floor,
-    which was briefly and wrongly credited to this function.
+    On the USB path the answer comes out at exactly zero, every time,
+    which is the answer rather than a disappointment: in over USB,
+    through the DSP, out over USB is a digital path end to end and
+    nobody resamples it.  That is worth having measured rather than
+    assumed, and it stops being true the moment this is pointed at the
+    analog loop.
     """
-    n = len(a)
-    A = np.fft.rfft(a)
-    k = np.arange(len(A))
-    c = slice(guard, n - guard)
-    bc = b[c]
-    bb = float(np.dot(bc, bc))
-
-    def resid(d):
-        aa = np.fft.irfft(A * np.exp(-2j * np.pi * k * d / n), n)[c]
-        g = float(np.dot(aa, bc) / max(np.dot(aa, aa), 1e-30))
-        r = bc - g * aa
-        return float(np.dot(r, r) / max(bb, 1e-30)), g
-
-    best = min((resid(d)[0], d) for d in np.arange(-0.6, 0.6, 0.02))[1]
-    best = min((resid(d)[0], d)
-               for d in np.arange(best - 0.02, best + 0.02, 0.0005))[1]
-    _, g = resid(best)
-    aa = np.fft.irfft(A * np.exp(-2j * np.pi * k * best / n), n)
-    return best, g, aa
+    return audio.fit_delay(a, b, guard)
 
 
 def verify(args, card, p, dry):

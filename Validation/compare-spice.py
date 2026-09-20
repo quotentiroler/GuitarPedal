@@ -234,25 +234,7 @@ def played(name, t, knobs, seconds=4.0):
 # sample as often as not.
 #
 def _align(ref, test, max_lag=None):
-    #
-    # Signed, which is why this is not audio.delay_samples().  That one
-    # searches r[:max_lag] and so only ever finds a lag - handed a signal
-    # that is *early* it returns 0.0, silently, and the caller subtracts
-    # nothing and reports the whole residual.  Checked on a known shift:
-    # +3.7 samples comes back as +3.704 and -2.5 comes back as 0.000.
-    # Here the model has always been the late one, but a helper that is
-    # right only in the direction you happen to be looking is how the
-    # next person gets it wrong.
-    #
-    L = max_lag or int(0.45 * FS / F0)
-    n = 1 << int(np.ceil(np.log2(len(ref) + 2 * L)))
-    r = np.fft.irfft(np.fft.rfft(test, n) * np.conj(np.fft.rfft(ref, n)), n)
-    idx = np.concatenate([np.arange(0, L + 1), np.arange(n - L, n)])
-    k = idx[int(np.argmax(r[idx]))]
-    a, b, c = r[(k - 1) % n], r[k], r[(k + 1) % n]
-    den = a - 2 * b + c
-    frac = 0.5 * (a - c) / den if den else 0.0
-    return (k - n if k > n // 2 else k) + frac
+    return audio.lag_samples(ref, test, max_lag or int(0.45 * FS / F0))
 
 
 def _shift(v, k):

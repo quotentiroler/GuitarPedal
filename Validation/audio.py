@@ -18,13 +18,12 @@
 # input - so injected signals have to be compared against the host's own
 # copy instead.
 #
-import contextlib
 import re
+import struct
 import subprocess
 import sys
 import threading
 import time
-import wave
 
 import numpy as np
 
@@ -201,18 +200,58 @@ def wav(path):
     spectrum that is nonsense - a shape wrong enough to be obvious in a
     picture and a level right enough that nothing questions it.
     """
-    with contextlib.closing(wave.open(path)) as w:
-        ch, width, rate = w.getnchannels(), w.getsampwidth(), w.getframerate()
-        raw = w.readframes(w.getnframes())
+    tag, ch, rate, width, raw = _riff(path)
     if rate != RATE:
         raise ValueError("%s is at %d Hz, not %d - decode() resamples, this "
                          "does not" % (path, rate, RATE))
-    if width not in (2, 4):
-        raise ValueError("%s is %d-bit; this reads 16 and 32"
-                         % (path, 8 * width))
-    d = np.frombuffer(raw, dtype="<i%d" % width).astype(np.float64)
-    d = d / float(2 ** (8 * width - 1))
-    return d if ch == 1 else d.reshape(-1, ch)
+    if tag == WAV_FLOAT and width == 4:
+        d = np.frombuffer(raw, dtype="<f4").astype(np.float64)
+    elif tag == WAV_PCM and width in (2, 4):
+        d = np.frombuffer(raw, dtype="<i%d" % width).astype(np.float64)
+        d = d / float(2 ** (8 * width - 1))
+    else:
+        raise ValueError("%s is format %d at %d-bit; this reads 16- and "
+                         "32-bit PCM and 32-bit float"
+                         % (path, tag, 8 * width))
+    return d if ch == 1 else d[:len(d) // ch * ch].reshape(-1, ch)
+
+
+# capture() writes PCM; tonetwist.py's recordings are float, which the
+# wave module refuses outright rather than reads.
+WAV_PCM = 1
+WAV_FLOAT = 3
+WAV_EXTENSIBLE = 0xFFFE
+
+
+def _riff(path):
+    """(format tag, channels, rate, bytes per sample, the data chunk).
+
+    Takes however much data is really there rather than what the length
+    field claims, so a part-fetched file reads as far as it got.
+    """
+    with open(path, "rb") as f:
+        head = f.read(12)
+        if head[:4] != b"RIFF" or head[8:12] != b"WAVE":
+            raise ValueError("%s is not a RIFF/WAVE file" % path)
+        fmt = None
+        while True:
+            hdr = f.read(8)
+            if len(hdr) < 8:
+                raise ValueError("%s ends before its data chunk" % path)
+            cid, size = hdr[:4], struct.unpack("<I", hdr[4:])[0]
+            if cid == b"fmt ":
+                body = f.read(size + (size & 1))
+                tag, ch, rate, _, align, _bits = struct.unpack("<HHIIHH",
+                                                               body[:16])
+                if tag == WAV_EXTENSIBLE and size >= 40:
+                    tag = struct.unpack("<H", body[24:26])[0]
+                fmt = (tag, ch, rate, align // max(ch, 1))
+            elif cid == b"data":
+                if fmt is None:
+                    raise ValueError("%s has its data chunk before fmt" % path)
+                return fmt + (f.read(size),)
+            else:
+                f.seek(size + (size & 1), 1)
 
 
 def decode(path, seconds=None, offset=None):
@@ -462,6 +501,90 @@ def null_db(a, b):
     whatever came between them was.
     """
     return dbfs(rms(a - b)) - dbfs(rms(b))
+
+
+def lag_samples(reference, test, max_lag):
+    """How far 'test' sits from 'reference', signed, in samples.
+
+    delay_samples() searches one direction and reports an early signal
+    as 0.0, silently.  Wants a broadband reference, as that one does.
+    """
+    n = 1 << int(np.ceil(np.log2(len(reference) + 2 * max_lag)))
+    r = np.fft.irfft(np.fft.rfft(test, n) * np.conj(np.fft.rfft(reference, n)),
+                     n)
+    idx = np.concatenate([np.arange(0, max_lag + 1), np.arange(n - max_lag, n)])
+    k = idx[int(np.argmax(r[idx]))]
+    a, b, c = r[(k - 1) % n], r[k], r[(k + 1) % n]
+    den = a - 2 * b + c
+    frac = 0.5 * (a - c) / den if den else 0.0
+    return (k - n if k > n // 2 else k) + frac
+
+
+def delay(x, samples):
+    """x moved by a fraction of a sample, as a phase ramp.
+
+    Exact for a band-limited signal.  The ramp is circular, so the ends
+    wrap.  The Nyquist bin is taken real: a real signal cannot say which
+    way that component moved.
+    """
+    n = len(x)
+    X = np.fft.rfft(x) * np.exp(-2j * np.pi * np.arange(n // 2 + 1)
+                                * samples / n)
+    if n % 2 == 0:
+        X[-1] = X[-1].real
+    return np.fft.irfft(X, n)
+
+
+def fit_delay(ref, test, guard, span=0.6):
+    """Line 'ref' up with 'test' to a fraction of a sample, and scale it.
+
+    A null taken on a sloppy alignment is a measurement of the
+    alignment: 0.05 samples out leaves a residual 48.5 dB down, 0.2
+    leaves 36.4.  lag_samples() only gets within a tenth, so this fits
+    the residual itself.  Returns (delay, gain, ref delayed by it).
+    """
+    n = len(ref)
+    c = slice(guard, n - guard)
+    tc = test[c]
+    tt = max(float(np.dot(tc, tc)), 1e-30)
+
+    def resid(d):
+        s = delay(ref, d)[c]
+        g = float(np.dot(s, tc) / max(np.dot(s, s), 1e-30))
+        r = tc - g * s
+        return float(np.dot(r, r) / tt), g
+
+    best = min((resid(d)[0], d) for d in np.arange(-span, span, span / 30))[1]
+    step = span / 30
+    best = min((resid(d)[0], d)
+               for d in np.arange(best - step, best + step, step / 40))[1]
+    return best, resid(best)[1], delay(ref, best)
+
+
+def coherence_db(a, b, nper=8192):
+    """What is left of b that no linear filter could make out of a.
+
+    A wrong resistor or corner is a filter away from being right and a
+    null cannot tell that from a mismatch no filter reaches.  Welch
+    averaged: a filter at full resolution would cancel anything at all.
+    """
+    w = np.hanning(nper)
+    hop = nper // 2
+    n = (min(len(a), len(b)) - nper) // hop
+    if n < 2:
+        raise ValueError("coherence_db wants at least %d samples" % (2 * nper))
+    saa = np.zeros(nper // 2 + 1)
+    sbb = np.zeros(nper // 2 + 1)
+    sab = np.zeros(nper // 2 + 1, dtype=complex)
+    for i in range(n):
+        o = i * hop
+        A = np.fft.rfft(a[o:o + nper] * w)
+        B = np.fft.rfft(b[o:o + nper] * w)
+        saa += np.abs(A) ** 2
+        sbb += np.abs(B) ** 2
+        sab += B * np.conj(A)
+    g2 = np.abs(sab) ** 2 / np.maximum(saa * sbb, 1e-30)
+    return dbfs(np.sqrt(np.sum(sbb * (1.0 - g2)))) - dbfs(np.sqrt(np.sum(sbb)))
 
 
 def trim(x, edge=0.05):
