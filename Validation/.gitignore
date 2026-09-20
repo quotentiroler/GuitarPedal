@@ -37,6 +37,9 @@ waves-*.png
 # The figures that are on the page are, as PNGs - a page has to read
 # correctly from a clone, and the scripts say how to remake the rest.
 #
-rat-*.json
+/rat-*.json
 figures/
-bench.exe
+bench/*.exe
+# tonetwist.py's copies of other people's recordings: CC BY-NC,
+# megabytes, and refetchable.
+.cache/
