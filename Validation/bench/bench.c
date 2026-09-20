@@ -424,8 +424,18 @@ static void bench_sample(raw_sample_t in, raw_sample_t *out)
 	*out = i2s_dma_buf[slot];
 }
 
+#ifdef _WIN32
+#include <fcntl.h>
+#include <io.h>
+#endif
+
 int main(int argc, char **argv)
 {
+#ifdef _WIN32
+	/* stdout is text mode here, and 0x0a inside a float becomes 0d 0a. */
+	_setmode(_fileno(stdin), _O_BINARY);
+	_setmode(_fileno(stdout), _O_BINARY);
+#endif
 	struct { struct effect *e; int pot; unsigned char val; } pots[64];
 	struct { struct effect *e; unsigned char val; } mixes[32];
 	struct effect *route[MAX_ROUTED_EFFECTS];

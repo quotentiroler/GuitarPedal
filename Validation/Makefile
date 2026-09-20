@@ -287,6 +287,17 @@ else
 endif
 
 #
+# Does the model still agree with the deck as well as it did?  Its own
+# target because it wants ngspice and takes minutes.
+#
+check-parity:
+ifeq ($(NGSPICE),)
+	@echo "parity: SKIPPED - no ngspice in PATH"
+else
+	./parity.py
+endif
+
+#
 # Which component is wrong, asked of a netlist rather than a board.  Its
 # own target because ngspice is the one thing here that is not python.
 #
