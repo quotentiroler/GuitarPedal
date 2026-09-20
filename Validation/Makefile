@@ -305,6 +305,13 @@ check-real: bench/bench
 	./compare-real.py
 
 #
+# What two real pedals cost each other, which is the ceiling on what
+# matching one of them can mean.  No bench: both sides are recordings.
+#
+check-pedals:
+	./compare-pedals.py
+
+#
 # Which component is wrong, asked of a netlist rather than a board.  Its
 # own target because ngspice is the one thing here that is not python.
 #

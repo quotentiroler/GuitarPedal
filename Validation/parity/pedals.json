@@ -1,0 +1,149 @@
+{
+  "settings": {
+    "bluesdriver dumkudo": {
+      "null": -2.83,
+      "shape": -8.46
+    },
+    "bluesdriver janray": {
+      "null": -1.64,
+      "shape": -10.66
+    },
+    "bluesdriver ktr": {
+      "null": -3.12,
+      "shape": -10.42
+    },
+    "bluesdriver ocd": {
+      "null": -3.68,
+      "shape": -13.3
+    },
+    "bluesdriver plumes": {
+      "null": -3.9,
+      "shape": -13.96
+    },
+    "bluesdriver redllama": {
+      "null": -1.0,
+      "shape": -9.83
+    },
+    "bluesdriver tubedreamer": {
+      "null": -4.33,
+      "shape": -10.82
+    },
+    "bluesdriver zendrive": {
+      "null": -2.8,
+      "shape": -11.88
+    },
+    "dumkudo janray": {
+      "null": -3.34,
+      "shape": -10.97
+    },
+    "dumkudo ktr": {
+      "null": -7.05,
+      "shape": -11.03
+    },
+    "dumkudo ocd": {
+      "null": -1.36,
+      "shape": -7.84
+    },
+    "dumkudo plumes": {
+      "null": -4.47,
+      "shape": -7.63
+    },
+    "dumkudo redllama": {
+      "null": -1.18,
+      "shape": -7.08
+    },
+    "dumkudo tubedreamer": {
+      "null": -8.0,
+      "shape": -12.95
+    },
+    "dumkudo zendrive": {
+      "null": -2.29,
+      "shape": -7.87
+    },
+    "janray ktr": {
+      "null": -3.73,
+      "shape": -13.3
+    },
+    "janray ocd": {
+      "null": -2.9,
+      "shape": -10.02
+    },
+    "janray plumes": {
+      "null": -6.3,
+      "shape": -10.04
+    },
+    "janray redllama": {
+      "null": -6.21,
+      "shape": -9.38
+    },
+    "janray tubedreamer": {
+      "null": -6.01,
+      "shape": -16.13
+    },
+    "janray zendrive": {
+      "null": -7.4,
+      "shape": -11.42
+    },
+    "ktr ocd": {
+      "null": -1.98,
+      "shape": -10.3
+    },
+    "ktr plumes": {
+      "null": -5.11,
+      "shape": -9.93
+    },
+    "ktr redllama": {
+      "null": -1.46,
+      "shape": -8.33
+    },
+    "ktr tubedreamer": {
+      "null": -8.78,
+      "shape": -13.91
+    },
+    "ktr zendrive": {
+      "null": -3.47,
+      "shape": -10.84
+    },
+    "ocd plumes": {
+      "null": -3.85,
+      "shape": -8.79
+    },
+    "ocd redllama": {
+      "null": -4.27,
+      "shape": -9.84
+    },
+    "ocd tubedreamer": {
+      "null": -3.1,
+      "shape": -8.2
+    },
+    "ocd zendrive": {
+      "null": -6.79,
+      "shape": -12.3
+    },
+    "plumes redllama": {
+      "null": -4.16,
+      "shape": -10.2
+    },
+    "plumes tubedreamer": {
+      "null": -7.8,
+      "shape": -10.8
+    },
+    "plumes zendrive": {
+      "null": -6.82,
+      "shape": -14.35
+    },
+    "redllama tubedreamer": {
+      "null": -2.73,
+      "shape": -9.47
+    },
+    "redllama zendrive": {
+      "null": -6.36,
+      "shape": -10.59
+    },
+    "tubedreamer zendrive": {
+      "null": -5.24,
+      "shape": -10.76
+    }
+  },
+  "target": "pedals"
+}
