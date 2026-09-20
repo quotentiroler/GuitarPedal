@@ -13,13 +13,10 @@
 # archive weighs: Zenodo honours range requests, so the index is read
 # first, then one member, and only as far as the seconds wanted.
 #
-import io
-import json
 import os
 import sys
-import time
-import urllib.request
-import zipfile
+
+import remotezip
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 CACHE = os.environ.get("TONETWIST_CACHE", os.path.join(HERE, ".cache", "tonetwist"))
@@ -51,104 +48,32 @@ SOURCES = ("nam", "idmt-gtr2", "idmt-gtr4-sg", "prvt-gtr", "yt-bass")
 DEFAULT_SOURCE = "nam"
 
 RATE = 48000
+WIDTH = 4
 
 
 def url_of(record, archive):
     return "https://zenodo.org/records/%s/files/%s" % (record, archive)
 
 
-def _range(url, lo, hi, tries=6):
-    """One range request, retried: Zenodo truncates a response now and then."""
-    want = hi - lo + 1
-    last = None
-    for attempt in range(tries):
-        try:
-            req = urllib.request.Request(
-                url, headers={"Range": "bytes=%d-%d" % (lo, hi)})
-            with urllib.request.urlopen(req, timeout=300) as r:
-                data, cr = r.read(), r.headers.get("Content-Range", "")
-            if len(data) == want:
-                return data, cr
-            last = "short: %d of %d" % (len(data), want)
-        except Exception as exc:
-            last = exc
-            if attempt == tries - 1:
-                raise
-        time.sleep(1.0 + attempt)
-    raise OSError("%s: %s" % (url, last))
-
-
-class _Remote(io.RawIOBase):
-    """Enough of a file for zipfile, served over range requests."""
-
-    def __init__(self, url):
-        self.url, self.pos, self.pulled = url, 0, 0
-        _, cr = _range(url, 0, 0)
-        self.size = int(cr.rsplit("/", 1)[1])
-
-    def readable(self):
-        return True
-
-    def seekable(self):
-        return True
-
-    def seek(self, off, whence=0):
-        self.pos = (off, self.pos + off, self.size + off)[whence]
-        return self.pos
-
-    def tell(self):
-        return self.pos
-
-    def readinto(self, buf):
-        n = min(len(buf), self.size - self.pos)
-        if n <= 0:
-            return 0
-        data, _ = _range(self.url, self.pos, self.pos + n - 1)
-        self.pulled += len(data)
-        buf[:len(data)] = data
-        self.pos += len(data)
-        return len(data)
-
-
-def _open(url):
-    raw = _Remote(url)
-    return zipfile.ZipFile(io.BufferedReader(raw, 1 << 20)), raw
+def _index(record, archive):
+    return remotezip.index(url_of(record, archive),
+                           os.path.join(CACHE, "%s.index.json" % archive))
 
 
 def members(record, archive):
     """Every path in the archive, read once and remembered."""
-    path = os.path.join(CACHE, "%s.index.json" % archive)
-    if os.path.exists(path):
-        with open(path) as f:
-            return json.load(f)
-    z, _ = _open(url_of(record, archive))
-    names = [n for n in z.namelist() if not n.endswith("/")]
-    os.makedirs(CACHE, exist_ok=True)
-    with open(path, "w", newline="\n") as f:
-        json.dump(names, f, indent=1)
-    return names
+    return sorted(_index(record, archive))
 
 
 def pull(record, archive, member, out, seconds=None):
     """One member into 'out', stopping once 'seconds' of audio is there."""
     if os.path.exists(out):
         return out
-    limit = None if seconds is None else 128 + int(seconds * RATE) * 4
-    z, raw = _open(url_of(record, archive))
-    os.makedirs(os.path.dirname(out), exist_ok=True)
-    tmp = out + ".part"
-    with z.open(member) as src, open(tmp, "wb") as dst:
-        left = limit
-        while left is None or left > 0:
-            chunk = src.read(1 << 20 if left is None else min(1 << 20, left))
-            if not chunk:
-                break
-            dst.write(chunk)
-            if left is not None:
-                left -= len(chunk)
-    os.replace(tmp, out)
+    want = None if seconds is None else 256 + int(seconds * RATE) * WIDTH
+    got = remotezip.member(url_of(record, archive),
+                           _index(record, archive)[member], out, want)
     print("  fetched %s (%.1f MB over the wire)"
-          % (os.path.basename(out), raw.pulled / 1e6), file=sys.stderr)
+          % (os.path.basename(out), got / 1e6), file=sys.stderr)
     return out
 
 
