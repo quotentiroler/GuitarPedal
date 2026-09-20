@@ -298,6 +298,13 @@ else
 endif
 
 #
+# The model against a recording of a real pedal.  Fetches about twelve
+# megabytes the first time and nothing after that.
+#
+check-real: bench/bench
+	./compare-real.py
+
+#
 # Which component is wrong, asked of a netlist rather than a board.  Its
 # own target because ngspice is the one thing here that is not python.
 #

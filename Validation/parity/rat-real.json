@@ -1,0 +1,29 @@
+{
+  "settings": {
+    "D=030 F=050 M=Normal V=100": {
+      "null": -7.7,
+      "shape": -10.51
+    },
+    "D=050 F=000 M=Normal V=100": {
+      "null": -7.36,
+      "shape": -7.82
+    },
+    "D=050 F=050 M=Normal V=100": {
+      "null": -8.81,
+      "shape": -9.18
+    },
+    "D=050 F=050 M=Turbo V=100": {
+      "null": -9.1,
+      "shape": -9.48
+    },
+    "D=050 F=100 M=Normal V=100": {
+      "null": -6.07,
+      "shape": -10.64
+    },
+    "D=100 F=050 M=Normal V=100": {
+      "null": -7.23,
+      "shape": -8.12
+    }
+  },
+  "target": "rat-real"
+}

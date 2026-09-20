@@ -77,8 +77,43 @@ TARGETS = {
         # it and moves a pulse's corner without changing what made it.
         #
         sweep={"Distortion": (0.05, 0.95), "Mode": [0, 1, 2]},
+        #
+        # Somebody else's pedal - see tonetwist.py.  Not the Helios and
+        # not a stock RAT, so this checks the family rather than the
+        # unit: Normal is the stock silicon pair, Turbo the LEDs, and
+        # Solo is a boost with no counterpart here.  Volume is left out
+        # because it only attenuates and the recording's level is fitted.
+        #
+        reference=dict(
+            device="rodent",
+            knobs=lambda c: {"Distortion": int(c["D"]) / 100.0,
+                             "Filter": int(c["F"]) / 100.0,
+                             "Volume": 0.5,
+                             "Sweep": 0.0,
+                             "Mode": {"Normal": 0, "Turbo": 2}[c["M"]]},
+        ),
     ),
 }
+
+
+def reference_settings(t):
+    """The recorded settings this target can be asked to match.
+
+    A setting the effect has no knob for is left out: comparing against
+    a control that is not modelled measures the missing control.
+    """
+    import tonetwist
+
+    ref = t.get("reference")
+    if not ref:
+        return []
+    out = []
+    for c in tonetwist.settings(ref["device"]):
+        try:
+            out.append((c, ref["knobs"](c)))
+        except KeyError:
+            continue
+    return out
 
 
 def target(name):
