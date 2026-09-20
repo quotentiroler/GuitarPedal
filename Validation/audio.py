@@ -206,6 +206,8 @@ def wav(path):
                          "does not" % (path, rate, RATE))
     if tag == WAV_FLOAT and width == 4:
         d = np.frombuffer(raw, dtype="<f4").astype(np.float64)
+    elif tag == WAV_PCM and width == 3:
+        d = _unpack24(raw) / float(1 << 23)
     elif tag == WAV_PCM and width in (2, 4):
         d = np.frombuffer(raw, dtype="<i%d" % width).astype(np.float64)
         d = d / float(2 ** (8 * width - 1))
@@ -221,6 +223,14 @@ def wav(path):
 WAV_PCM = 1
 WAV_FLOAT = 3
 WAV_EXTENSIBLE = 0xFFFE
+
+
+def _unpack24(raw):
+    """Signed 24-bit little-endian samples, which numpy has no dtype for."""
+    b = np.frombuffer(raw[:len(raw) // 3 * 3], dtype=np.uint8).reshape(-1, 3)
+    return (b[:, 0].astype(np.int32)
+            | (b[:, 1].astype(np.int32) << 8)
+            | (b[:, 2].view(np.int8).astype(np.int32) << 16)).astype(np.float64)
 
 
 def _riff(path):
@@ -548,8 +558,20 @@ def fit_delay(ref, test, guard, span=0.6):
     tc = test[c]
     tt = max(float(np.dot(tc, tc)), 1e-30)
 
+    # The forward transform is the same at every trial delay, so it is
+    # taken once; the search calls this about 140 times.
+    R = np.fft.rfft(ref)
+    w = -2j * np.pi * np.arange(len(R)) / n
+    even = n % 2 == 0
+
+    def shifted(d):
+        X = R * np.exp(w * d)
+        if even:
+            X[-1] = X[-1].real
+        return np.fft.irfft(X, n)
+
     def resid(d):
-        s = delay(ref, d)[c]
+        s = shifted(d)[c]
         g = float(np.dot(s, tc) / max(np.dot(s, s), 1e-30))
         r = tc - g * s
         return float(np.dot(r, r) / tt), g
@@ -558,7 +580,7 @@ def fit_delay(ref, test, guard, span=0.6):
     step = span / 30
     best = min((resid(d)[0], d)
                for d in np.arange(best - step, best + step, step / 40))[1]
-    return best, resid(best)[1], delay(ref, best)
+    return best, resid(best)[1], shifted(best)
 
 
 def coherence_db(a, b, nper=8192):

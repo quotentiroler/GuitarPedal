@@ -30,13 +30,17 @@ def check(name, ok, detail=""):
         fails.append(name)
 
 
-def write_wav(path, x, tag, ch=1):
+def write_wav(path, x, tag, ch=1, bits=32):
     x = np.asarray(x)
     if tag == audio.WAV_FLOAT:
-        body, bits = x.astype("<f4").tobytes(), 32
+        body = x.astype("<f4").tobytes()
+    elif bits == 24:
+        v = np.round(x * (2 ** 23 - 1)).astype(np.int32)
+        b = np.empty((len(v), 3), dtype=np.uint8)
+        b[:, 0], b[:, 1], b[:, 2] = v & 255, (v >> 8) & 255, (v >> 16) & 255
+        body = b.tobytes()
     else:
         body = (x * (2 ** 31 - 1)).astype("<i4").tobytes()
-        bits = 32
     align = ch * bits // 8
     fmt = struct.pack("<HHIIHH", tag, ch, FS, FS * align, align, bits)
     with open(path, "wb") as f:
@@ -76,6 +80,14 @@ with tempfile.TemporaryDirectory() as d:
     got = audio.wav(p)
     check("32-bit pcm still reads back",
           np.max(np.abs(got - want)) < 1e-6)
+
+    # pOD-set is 24-bit, which numpy has no dtype for.
+    p = os.path.join(d, "i24.wav")
+    write_wav(p, want, audio.WAV_PCM, bits=24)
+    got = audio.wav(p)
+    check("24-bit pcm reads back, sign and all",
+          len(got) == len(want) and np.max(np.abs(got - want)) < 2e-7
+          and got.min() < -0.1, "worst %.2e" % np.max(np.abs(got - want)))
 
     # A part-fetched member has a whole-file header and a short data
     # chunk; refusing it would mean fetching gigabytes for 20 seconds.
