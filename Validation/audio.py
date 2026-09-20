@@ -525,9 +525,13 @@ def lag_samples(reference, test, max_lag):
     idx = np.concatenate([np.arange(0, max_lag + 1), np.arange(n - max_lag, n)])
     k = idx[int(np.argmax(r[idx]))]
     a, b, c = r[(k - 1) % n], r[k], r[(k + 1) % n]
+
+    # Only interpolate a real peak.  A peak outside max_lag puts the best
+    # in range on an edge, where the parabola divides by nearly nothing:
+    # asked for +-8 samples it answered -4624 and +67021.
     den = a - 2 * b + c
-    frac = 0.5 * (a - c) / den if den else 0.0
-    return (k - n if k > n // 2 else k) + frac
+    frac = 0.5 * (a - c) / den if den < 0 else 0.0
+    return (k - n if k > n // 2 else k) + min(0.5, max(-0.5, frac))
 
 
 def delay(x, samples):
