@@ -66,7 +66,10 @@ REP = 6
 F0 = 220.0
 
 LADDER = (-66, -54, -42, -30, -24, -18, -12, -6, 0)
-LIN_HZ = (40, 80, 160, 320, 640, 1250, 2500, 5000)
+# Up to 16k, not 5k: the model runs bright where a one-pole
+# difference equation flattens and the analog pole does not, and
+# stopping at 5000 meant nothing here could see it.
+LIN_HZ = (40, 80, 160, 320, 640, 1250, 2500, 5000, 10000, 16000)
 
 
 def harmonics(y):
