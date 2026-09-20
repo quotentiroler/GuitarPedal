@@ -95,8 +95,11 @@ static inline float _single_pole_step(float in,
 // quantity small all the way through: sqrt(2u) dominates u rather than
 // nearly cancelling it.
 //
-// Undefined above Nyquist, as it was before: fastsincos() wraps and the
-// answer comes back down again.  Nothing asks.
+// Above Nyquist fastsincos() wraps and the corner comes back down
+// again.  [RAT]'s Filter at 0 asks for 32 kHz and so gets 15.8 kHz.
+// Returning alpha 1 there is the defensible answer and measures 3 dB
+// worse - the wrap is cancelling the chain's excess above 8 kHz - so it
+// is left alone and parity.py holds Filter=0 to catch either moving.
 //
 static inline struct single_pole_coeff single_pole_freq(float freq)
 {
