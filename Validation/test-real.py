@@ -115,6 +115,12 @@ for shift in (3.7, -2.5, 0.0, 11.0, -17.25):
     check("lag_samples finds %+.2f samples to a tenth" % shift,
           abs(got - shift) < 0.15, "got %+.3f" % got)
 
+# A peak outside the window is unfindable; saying so is the contract.
+for shift, win in ((60.0, 8), (-40.0, 16)):
+    got = audio.lag_samples(x, audio.delay(x, shift), win)
+    check("lag_samples stays inside +-%d when the peak is at %+.0f"
+          % (win, shift), abs(got) <= win + 0.5, "got %+.3f" % got)
+
 got = audio.delay_samples(x, audio.delay(x, -2.5), 64)
 check("delay_samples cannot express an early signal at all",
       got >= 0.0 and abs(got + 2.5) > 1.0, "got %+.3f" % got)
@@ -178,6 +184,25 @@ check("a knob position becomes a fraction of travel",
 check("volume is not read off the recording",
       ref["knobs"](dict(got, V="100"))["Volume"]
       == ref["knobs"](dict(got, V="050"))["Volume"])
+
+# compare-bench.py's knob parsing, which is the half that needs no bench.
+import importlib.util
+spec = importlib.util.spec_from_file_location("cb", os.path.join(HERE, "compare-bench.py"))
+cb = importlib.util.module_from_spec(spec)
+sys.modules["cb"] = cb
+spec.loader.exec_module(cb)
+
+t = T.target("rat")
+got = cb.knobs_from("Distortion=0.8,Mode=2", t)
+check("knobs_from overrides only what it is given",
+      got["Distortion"] == 0.8 and got["Mode"] == 2.0
+      and got["Filter"] == t["knobs"]["Filter"], str(got))
+for bad in ("Distortion", "Nonesuch=1"):
+    try:
+        cb.knobs_from(bad, t)
+        check("knobs_from refuses %r" % bad, False, "it was accepted")
+    except SystemExit:
+        check("knobs_from refuses %r" % bad, True)
 
 print()
 if fails:
