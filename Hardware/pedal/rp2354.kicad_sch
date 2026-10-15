@@ -583,266 +583,6 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Memory_RAM:APS6404L-3SQRx-ZR"
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(in_pos_files yes)
-			(duplicate_pin_numbers_are_jumpers no)
-			(property "Reference" "U"
-				(at -6.35 11.43 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Value" "APS6404L-3SQRx-ZR"
-				(at 11.684 11.43 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Footprint" "Package_SON:Winbond_USON-8-1EP_3x2mm_P0.5mm_EP0.2x1.6mm"
-				(at 0 -15.24 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Datasheet" "https://www.mouser.com/datasheet/2/1127/APM_PSRAM_QSPI_APS6404L_3SQR_v2_3_PKG-1954826.pdf"
-				(at 0 -17.78 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Description" "64 Mbit / 8M x 8-bits serial pseudo SRAM MEMORY, up to 133MHz, 2.7-3.6V supply, USON-8 (XSON-8)"
-				(at 0 -20.32 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "ki_keywords" "qspi qpi spi psram"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "ki_fp_filters" "*SON*3x2mm*P0.5mm*EP0.2x1.6mm*"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(symbol "APS6404L-3SQRx-ZR_0_1"
-				(rectangle
-					(start -7.62 10.16)
-					(end 7.62 -10.16)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type background)
-					)
-				)
-			)
-			(symbol "APS6404L-3SQRx-ZR_1_1"
-				(pin input line
-					(at -10.16 7.62 0)
-					(length 2.54)
-					(name "~{CE}"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin bidirectional line
-					(at -10.16 0 0)
-					(length 2.54)
-					(name "SO/SIO1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin bidirectional line
-					(at -10.16 -2.54 0)
-					(length 2.54)
-					(name "SIO2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "3"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin power_in line
-					(at 0 -12.7 90)
-					(length 2.54)
-					(name "VSS"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "4"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin bidirectional line
-					(at -10.16 2.54 0)
-					(length 2.54)
-					(name "SI/SIO0"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "5"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin input line
-					(at -10.16 5.08 0)
-					(length 2.54)
-					(name "SCLK"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "6"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin bidirectional line
-					(at -10.16 -5.08 0)
-					(length 2.54)
-					(name "SIO3"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "7"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin power_in line
-					(at 0 12.7 270)
-					(length 2.54)
-					(name "VDD"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "8"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 2.54 -12.7 90)
-					(length 2.54)
-					(name "EPAD"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "9"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)
 		(symbol "Mylib:AOTA-B201610S3R3-101-T"
 			(pin_numbers
 				(hide yes)
@@ -2869,12 +2609,6 @@
 		(uuid "35c83d85-0ad9-4909-aa3e-5c2d45ee908b")
 	)
 	(junction
-		(at 46.99 149.86)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "3afb7253-1caa-4fc5-bf08-ad9bce2ba3e4")
-	)
-	(junction
 		(at 31.75 74.93)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -3031,12 +2765,6 @@
 		(uuid "93e04aa7-ab9f-4cc0-b81d-3b6ecca071af")
 	)
 	(junction
-		(at 48.26 180.34)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "95cbce76-0ca2-4680-a483-0dadd24258af")
-	)
-	(junction
 		(at 31.75 49.53)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -3053,12 +2781,6 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "b62d8484-4052-4cbb-8c1f-dd0bc477718d")
-	)
-	(junction
-		(at 34.29 160.02)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "bef8176b-3504-4b46-850d-892658cbbc80")
 	)
 	(junction
 		(at 180.34 34.29)
@@ -3089,6 +2811,26 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "f8d7c1a7-ea44-4383-8d45-d8dd8b055446")
+	)
+	(no_connect
+		(at 90.17 91.44)
+		(uuid "1df7b765-3f04-48a9-8a74-8ef783b0fb63")
+	)
+	(no_connect
+		(at 90.17 88.9)
+		(uuid "3a49bc87-d3d8-4a6c-9e0e-f727a9d6572e")
+	)
+	(no_connect
+		(at 90.17 97.79)
+		(uuid "4b176e5b-500d-4562-a984-87fe79e649f0")
+	)
+	(no_connect
+		(at 90.17 93.98)
+		(uuid "5b146202-52fb-48b9-abc7-94960528dae4")
+	)
+	(no_connect
+		(at 90.17 86.36)
+		(uuid "d44b6c43-35ea-4ce2-9b15-2beeb4e32188")
 	)
 	(bus_entry
 		(at 175.26 114.3)
@@ -3552,16 +3294,6 @@
 	)
 	(wire
 		(pts
-			(xy 34.29 149.86) (xy 34.29 151.13)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "1aefef36-b27a-4c7f-b7ea-068ed772309d")
-	)
-	(wire
-		(pts
 			(xy 157.48 24.13) (xy 157.48 25.4)
 		)
 		(stroke
@@ -3739,16 +3471,6 @@
 			(type default)
 		)
 		(uuid "38954ccf-0ae0-4202-8a8e-9cf40e1f6ec2")
-	)
-	(wire
-		(pts
-			(xy 48.26 180.34) (xy 48.26 181.61)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "39e94871-05bd-461c-81c8-17b883b4f074")
 	)
 	(wire
 		(pts
@@ -4262,16 +3984,6 @@
 	)
 	(wire
 		(pts
-			(xy 46.99 180.34) (xy 48.26 180.34)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "86cbdf9f-c4f5-47a2-8a1c-c22dea18c3fb")
-	)
-	(wire
-		(pts
 			(xy 153.67 99.06) (xy 175.26 99.06)
 		)
 		(stroke
@@ -4349,16 +4061,6 @@
 			(type default)
 		)
 		(uuid "91294c23-bf97-4509-9598-5661e25ff5ed")
-	)
-	(wire
-		(pts
-			(xy 34.29 158.75) (xy 34.29 160.02)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "9213b551-fd43-4bde-8bb9-765dcbcdcf6b")
 	)
 	(wire
 		(pts
@@ -4542,16 +4244,6 @@
 	)
 	(wire
 		(pts
-			(xy 46.99 149.86) (xy 34.29 149.86)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "b1d2443d-dd77-4102-99b0-671152351976")
-	)
-	(wire
-		(pts
 			(xy 130.81 44.45) (xy 134.62 44.45)
 		)
 		(stroke
@@ -4669,16 +4361,6 @@
 			(type default)
 		)
 		(uuid "bf794443-2f3c-4804-b845-c7b116508912")
-	)
-	(wire
-		(pts
-			(xy 46.99 148.59) (xy 46.99 149.86)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "c0dabd72-3052-4efa-8da3-6bc479387b6e")
 	)
 	(wire
 		(pts
@@ -4922,16 +4604,6 @@
 	)
 	(wire
 		(pts
-			(xy 46.99 149.86) (xy 62.23 149.86)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "dd758988-a0b2-4ca6-874b-4fc3ad4e4ae2")
-	)
-	(wire
-		(pts
 			(xy 153.67 73.66) (xy 175.26 73.66)
 		)
 		(stroke
@@ -4979,16 +4651,6 @@
 			(type default)
 		)
 		(uuid "e13d09d9-2d8a-4555-bdaf-884095a60634")
-	)
-	(wire
-		(pts
-			(xy 46.99 149.86) (xy 46.99 154.94)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "e15fdd29-56e2-4edf-845d-657fe6059084")
 	)
 	(wire
 		(pts
@@ -5052,16 +4714,6 @@
 	)
 	(wire
 		(pts
-			(xy 34.29 160.02) (xy 36.83 160.02)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "ec65cb5b-a5b1-499f-8b21-f260c95da505")
-	)
-	(wire
-		(pts
 			(xy 153.67 114.3) (xy 175.26 114.3)
 		)
 		(stroke
@@ -5079,16 +4731,6 @@
 			(type default)
 		)
 		(uuid "ee9c2fea-8b72-4a70-81e7-f145ae67955c")
-	)
-	(wire
-		(pts
-			(xy 29.21 160.02) (xy 34.29 160.02)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "ef345924-44fc-4cd7-9f55-45998d542ffb")
 	)
 	(bus
 		(pts
@@ -5109,16 +4751,6 @@
 			(type default)
 		)
 		(uuid "f3114332-3f80-40dc-a727-b0698e4e89b9")
-	)
-	(wire
-		(pts
-			(xy 48.26 180.34) (xy 49.53 180.34)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "f3b553da-a5b4-4693-8aa3-4c24ea72ecab")
 	)
 	(wire
 		(pts
@@ -5240,16 +4872,6 @@
 		)
 		(uuid "06bd2c70-2122-4fab-9557-bde9601e3521")
 	)
-	(label "SD1"
-		(at 36.83 167.64 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "17d29055-b173-488e-b1f0-a0b9fd7aafb1")
-	)
 	(label "XIN"
 		(at 81.28 106.68 0)
 		(effects
@@ -5280,16 +4902,6 @@
 		)
 		(uuid "393ec539-1125-4a87-babe-1d654497ec43")
 	)
-	(label "GPIO0"
-		(at 29.21 160.02 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "3babffa8-60c4-44a9-b5eb-0c75a501c345")
-	)
 	(label "ADC1"
 		(at 153.67 142.24 0)
 		(effects
@@ -5309,26 +4921,6 @@
 			(justify left bottom)
 		)
 		(uuid "3f375a60-3f5a-4700-b1af-8f281259353b")
-	)
-	(label "SD0"
-		(at 90.17 86.36 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "4109b1a8-c008-49d5-9176-2b1200801a57")
-	)
-	(label "SD0"
-		(at 36.83 165.1 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "423563cc-a3be-4751-875e-562537cae6a7")
 	)
 	(label "SWDIO"
 		(at 90.17 138.43 180)
@@ -5370,16 +4962,6 @@
 		)
 		(uuid "4da8d706-321e-4938-adc8-7a987af98dd5")
 	)
-	(label "SD3"
-		(at 90.17 93.98 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "4e2765c6-f960-4f0e-bb09-12e740ef051a")
-	)
 	(label "GPIO24"
 		(at 153.67 132.08 0)
 		(effects
@@ -5399,16 +4981,6 @@
 			(justify left bottom)
 		)
 		(uuid "5ce6a79d-3c12-4986-b104-07bd31963449")
-	)
-	(label "SD3"
-		(at 36.83 172.72 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "66cfb63a-0333-43f4-aec6-80bd8e9144a5")
 	)
 	(label "GPIO19"
 		(at 153.67 119.38 0)
@@ -5480,16 +5052,6 @@
 		)
 		(uuid "a1bb365f-3adb-4270-81d0-96b5ff053b39")
 	)
-	(label "SD2"
-		(at 90.17 91.44 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "acc37ecb-79d0-4b5e-a34b-8434c18db70c")
-	)
 	(label "SWCLK"
 		(at 90.17 135.89 180)
 		(effects
@@ -5550,16 +5112,6 @@
 		)
 		(uuid "c2653ca2-b3b7-4bc1-b2eb-834721cc4ade")
 	)
-	(label "SD1"
-		(at 90.17 88.9 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "c4396da7-46b1-4148-bdd4-c54dd17a5a52")
-	)
 	(label "VREG_AVDD"
 		(at 78.105 49.53 0)
 		(effects
@@ -5569,26 +5121,6 @@
 			(justify left bottom)
 		)
 		(uuid "c45da85a-fa3f-4ec2-bbeb-e1c067c4069c")
-	)
-	(label "SCLK"
-		(at 36.83 162.56 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "c58216e7-3589-4764-acd7-57df6980c7bc")
-	)
-	(label "SCLK"
-		(at 90.17 97.79 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "c6e31851-9182-457d-95c9-7e99a9b3c81e")
 	)
 	(label "GPIO7"
 		(at 153.67 88.9 0)
@@ -5629,16 +5161,6 @@
 			(justify left bottom)
 		)
 		(uuid "d5c5ad7e-be3e-486d-91be-88bfa3c48348")
-	)
-	(label "SD2"
-		(at 36.83 170.18 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "debe2c33-9d4e-44e7-8799-d2962e5dd1c0")
 	)
 	(label "GPIO17"
 		(at 153.67 114.3 0)
@@ -8895,197 +8417,6 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:C")
-		(at 62.23 153.67 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(uuid "98eef63b-5e4a-4d4c-9a88-b0434a206403")
-		(property "Reference" "C404"
-			(at 65.151 152.5016 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "0.1uF"
-			(at 65.151 154.813 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric"
-			(at 63.1952 157.48 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 62.23 153.67 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "0.1uF 16V 10% X7R 0402"
-			(at 62.23 153.67 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "LCSC PN" "C1525"
-			(at 62.23 153.67 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "MANUFACTURER_PART_NUMBER" "CL05B104KO5NNNC"
-			(at 62.23 153.67 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Sim.Params" ""
-			(at 62.23 153.67 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "2ac69005-d40a-4340-bf3f-774f7f878c48")
-		)
-		(pin "2"
-			(uuid "f2531a87-8a93-4c53-9c03-f136db7377d0")
-		)
-		(instances
-			(project "pedal"
-				(path "/1cfc5ec2-6e92-4f8b-bcac-06388472f146/bb378633-604e-4622-ba6e-edab6adacf96"
-					(reference "C404")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:GND")
-		(at 48.26 181.61 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(uuid "98f909ae-c9ea-4bbc-b869-a42453219f83")
-		(property "Reference" "#PWR0405"
-			(at 48.26 187.96 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "GND"
-			(at 48.387 186.0042 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 48.26 181.61 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 48.26 181.61 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" ""
-			(at 48.26 181.61 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "e670473b-7e1f-4e21-a743-b6a735d857cd")
-		)
-		(instances
-			(project "pedal"
-				(path "/1cfc5ec2-6e92-4f8b-bcac-06388472f146/bb378633-604e-4622-ba6e-edab6adacf96"
-					(reference "#PWR0405")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Device:R")
 		(at 161.29 63.5 90)
 		(mirror x)
@@ -9385,83 +8716,6 @@
 			(project "pedal"
 				(path "/1cfc5ec2-6e92-4f8b-bcac-06388472f146/bb378633-604e-4622-ba6e-edab6adacf96"
 					(reference "C405")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:GND")
-		(at 62.23 157.48 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(uuid "a0a86967-57c2-454a-8a99-aa6415431324")
-		(property "Reference" "#PWR0407"
-			(at 62.23 163.83 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "GND"
-			(at 62.357 161.8742 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 62.23 157.48 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 62.23 157.48 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" ""
-			(at 62.23 157.48 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "76aa8647-e6b1-4ff2-bc4c-d130054ee277")
-		)
-		(instances
-			(project "pedal"
-				(path "/1cfc5ec2-6e92-4f8b-bcac-06388472f146/bb378633-604e-4622-ba6e-edab6adacf96"
-					(reference "#PWR0407")
 					(unit 1)
 				)
 			)
@@ -10137,83 +9391,6 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+3V3")
-		(at 46.99 148.59 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(uuid "d5d98f5e-570f-4c27-be64-c25e1b0b11c8")
-		(property "Reference" "#PWR0404"
-			(at 46.99 152.4 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "+3V3"
-			(at 47.371 144.1958 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 46.99 148.59 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 46.99 148.59 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" ""
-			(at 46.99 148.59 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "1011fe20-d88a-4e44-8065-93fadba48c5a")
-		)
-		(instances
-			(project "pedal"
-				(path "/1cfc5ec2-6e92-4f8b-bcac-06388472f146/bb378633-604e-4622-ba6e-edab6adacf96"
-					(reference "#PWR0404")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Device:C")
 		(at 198.12 58.42 0)
 		(unit 1)
@@ -10634,268 +9811,6 @@
 			(project "pedal"
 				(path "/1cfc5ec2-6e92-4f8b-bcac-06388472f146/bb378633-604e-4622-ba6e-edab6adacf96"
 					(reference "Y401")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Memory_RAM:APS6404L-3SQRx-ZR")
-		(at 46.99 167.64 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "e0b619cd-cab1-4749-8144-0f584484198c")
-		(property "Reference" "U401"
-			(at 55.88 166.3699 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "APS6404L-3SQRx-ZR"
-			(at 55.88 168.9099 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Package_SON:Winbond_USON-8-1EP_3x2mm_P0.5mm_EP0.2x1.6mm"
-			(at 46.99 182.88 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" "https://www.mouser.com/datasheet/2/1127/APM_PSRAM_QSPI_APS6404L_3SQR_v2_3_PKG-1954826.pdf"
-			(at 46.99 185.42 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "64 Mbit / 8M x 8-bits serial pseudo SRAM MEMORY, up to 133MHz, 2.7-3.6V supply, USON-8 (XSON-8)"
-			(at 46.99 187.96 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "LCSC PN" "C3040877"
-			(at 46.99 187.96 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "MANUFACTURER_PART_NUMBER" "APS6404L-3SQR-ZR"
-			(at 46.99 187.96 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "4"
-			(uuid "b6a1a0ac-42dd-415a-83d1-e2e5ca44b521")
-		)
-		(pin "2"
-			(uuid "bd5e8211-95cf-4729-bd9c-bc4eaaf0c9be")
-		)
-		(pin "7"
-			(uuid "43dcec7e-875f-42d1-bc8f-fd531548eaef")
-		)
-		(pin "3"
-			(uuid "6cf47878-81cf-4c70-809d-2a381c3b97b6")
-		)
-		(pin "1"
-			(uuid "ea87eb31-a945-49fb-97ce-d7b9fa3002b1")
-		)
-		(pin "5"
-			(uuid "f9409c7d-0550-43e0-9803-69762b3c02fa")
-		)
-		(pin "6"
-			(uuid "b9f49470-9d01-4acc-8e9e-9a0c13ab1e3c")
-		)
-		(pin "8"
-			(uuid "1b222d72-e3f2-458f-a9e5-024e20898bf2")
-		)
-		(pin "9"
-			(uuid "fa6f67b3-4ddd-48c1-b761-6ea99b65313d")
-		)
-		(instances
-			(project "pedal"
-				(path "/1cfc5ec2-6e92-4f8b-bcac-06388472f146/bb378633-604e-4622-ba6e-edab6adacf96"
-					(reference "U401")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:R")
-		(at 34.29 154.94 0)
-		(mirror x)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim yes)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(uuid "ea50cfb9-a5a0-4b99-835e-afeddaa627c0")
-		(property "Reference" "R401"
-			(at 31.75 153.6699 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-		)
-		(property "Value" "2.2kΩ"
-			(at 31.75 156.2099 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
-			(at 32.512 154.94 90)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 34.29 154.94 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "2.2kΩ 50V 1% 0402"
-			(at 34.29 154.94 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "MANUFACTURER_PART_NUMBER" "0402WGF2201TCE"
-			(at 34.29 154.94 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Sim.Device" ""
-			(at 34.29 154.94 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Sim.Pins" ""
-			(at 34.29 154.94 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "LCSC PN" "C25879"
-			(at 34.29 154.94 90)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Sim.Params" ""
-			(at 34.29 154.94 90)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "eab68643-382d-4fac-b711-52430c8074f5")
-		)
-		(pin "2"
-			(uuid "cad81d9f-aaf7-470b-9c4a-6dda25702fee")
-		)
-		(instances
-			(project "pedal"
-				(path "/1cfc5ec2-6e92-4f8b-bcac-06388472f146/bb378633-604e-4622-ba6e-edab6adacf96"
-					(reference "R401")
 					(unit 1)
 				)
 			)
